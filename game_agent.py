@@ -7,7 +7,8 @@ You must test your agent's strength against a set of agents with known
 relative strength using tournament.py and include the results in your report.
 """
 import random
-
+from random import randint
+import utils
 
 class Timeout(Exception):
     """Subclass base exception for code clarity."""
@@ -38,7 +39,16 @@ def custom_score(game, player):
     """
 
     # TODO: finish this function!
-    raise NotImplementedError
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
+
+    own_moves = len(game.get_legal_moves(player))
+    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+    return float(own_moves - opp_moves)
+    #raise NotImplementedError
 
 
 class CustomPlayer:
@@ -119,6 +129,10 @@ class CustomPlayer:
         self.time_left = time_left
 
         # TODO: finish this function!
+        if not legal_moves:
+            return (-1, -1)
+        _, move = max([(self.score(game.forecast_move(m), self), m) for m in legal_moves])
+        return move
 
         # Perform any required initializations, including selecting an initial
         # move from the game board (i.e., an opening book), or returning
@@ -136,8 +150,8 @@ class CustomPlayer:
             pass
 
         # Return the best move from the last completed search iteration
-        raise NotImplementedError
-
+        #raise NotImplementedError
+        
     def minimax(self, game, depth, maximizing_player=True):
         """Implement the minimax search algorithm as described in the lectures.
 
@@ -173,7 +187,37 @@ class CustomPlayer:
             raise Timeout()
 
         # TODO: finish this function!
-        raise NotImplementedError
+        """
+        legal_moves = game.get_legal_moves()
+        if not legal_moves:
+            return (self.score(game,self),(-1, -1))
+        _, move = max([(self.score(game.forecast_move(m), self), m) for m in legal_moves])
+        return (self.score(game,self),move)
+        """
+        #player = game.get_move(state)
+        infinity = float("inf")
+        
+        def max_value(state):
+            if not game.get_legal_moves():
+                return game.utility(state, self)
+            v = -infinity
+            for s in game.get_legal_moves():
+                v = max(v, min_value(s))
+            return v
+
+        def min_value(state):
+            if not game.get_legal_moves():
+                return game.utility(state, self)
+            v = infinity
+            for s in game.get_legal_moves():
+                v = min(v, max_value(s))
+            return v
+
+        # Body of minimax_decision starts here:
+        action, state = utils.argmax(game.get_legal_moves(),lambda s : min_value(s))
+        return action
+        
+        #raise NotImplementedError
 
     def alphabeta(self, game, depth, alpha=float("-inf"), beta=float("inf"), maximizing_player=True):
         """Implement minimax search with alpha-beta pruning as described in the
