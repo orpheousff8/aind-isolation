@@ -187,35 +187,67 @@ class CustomPlayer:
             raise Timeout()
 
         # TODO: finish this function!
+
+        def min_value(game ,depth):
+            legal_moves = game.get_legal_moves()
+            if not legal_moves:
+                return self.score(game,self), (-1,-1)
+            elif depth == 0:
+                return self.score(game,self), min([(self.score(game.forecast_move(m), self), m) for m in legal_moves])
+            
+            min_v = float("inf")
+            state = None
+            for a in legal_moves:
+                v,s = max_value(game.forecast_move(a),depth-1)
+                if v < min_v:
+                    min_v = v
+                    state = s
+            
+            return min_v,state
+            
+        def max_value(game ,depth):
+            legal_moves = game.get_legal_moves()
+            if not legal_moves:
+                return self.score(game,self), (-1,-1)
+            elif depth == 0:
+                return self.score(game,self), max([(self.score(game.forecast_move(m), self), m) for m in legal_moves])
+
+            max_v = float("-inf")
+            state = None
+            for a in legal_moves:
+                v,s = min_value(game.forecast_move(a),depth-1)
+                if v > max_v:
+                    max_v = v
+                    state = s
+            
+            return max_v,state
+
         """
         legal_moves = game.get_legal_moves()
         if not legal_moves:
             return (self.score(game,self),(-1, -1))
         _, move = max([(self.score(game.forecast_move(m), self), m) for m in legal_moves])
+        
         return (self.score(game,self),move)
         """
-        #player = game.get_move(state)
-        infinity = float("inf")
         
-        def max_value(state):
-            if not game.get_legal_moves():
-                return game.utility(state, self)
-            v = -infinity
-            for s in game.get_legal_moves():
-                v = max(v, min_value(s))
-            return v
+        legal_moves = game.get_legal_moves()
+        if not legal_moves:
+            return self.score(game,self),(-1, -1)
+            
+        max_v = float("-inf")
+        state = None
 
-        def min_value(state):
-            if not game.get_legal_moves():
-                return game.utility(state, self)
-            v = infinity
-            for s in game.get_legal_moves():
-                v = min(v, max_value(s))
-            return v
+        for a in legal_moves:
+            max_v = float("-inf")
+            state = None
+            v,s = min_value(game.forecast_move(a),0)
+            if v > max_v:
+                max_v = v
+                state = s
+                    
+        return max_v,state
 
-        # Body of minimax_decision starts here:
-        action, state = utils.argmax(game.get_legal_moves(),lambda s : min_value(s))
-        return action
         
         #raise NotImplementedError
 
