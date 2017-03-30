@@ -221,6 +221,8 @@ class CustomPlayer:
 
             return best_score, best_move
 
+        # The first round is always MAX
+
         best_score = float("-inf")
         best_move = game.get_player_location(self)  # the current position
         legal_moves = game.get_legal_moves()
@@ -281,6 +283,80 @@ class CustomPlayer:
 
         # TODO: finish this function!
 
+        def min_value(game, depth, alpha, beta):
 
+            best_score = float("inf")
+            best_move = game.get_player_location(self)  # the current position
+            legal_moves = game.get_legal_moves()
+
+            if alpha == float("inf"):
+                return (best_score, best_move)
+
+            if not legal_moves or depth == 0:
+                return self.score(game, self), best_move
+
+            for move in legal_moves:
+                score, _ = max_value(game.forecast_move(move), depth - 1, alpha, beta)
+
+                if score < best_score:
+                    best_score = score
+                    best_move = move
+
+                if best_score <= alpha:
+                    return best_score, best_move
+
+                beta = min(beta, best_score)
+
+            return best_score, best_move
+
+        def max_value(game, depth, alpha, beta):
+
+            best_score = float("-inf")
+            best_move = game.get_player_location(self)  # the current position
+            legal_moves = game.get_legal_moves()
+
+            if beta == float("-inf"):
+                return (best_score, best_move)
+
+
+            if not legal_moves or depth == 0:
+                return self.score(game, self), best_move
+
+            for move in legal_moves:
+                score, _ = min_value(game.forecast_move(move), depth - 1, alpha, beta)
+
+                if score > best_score:
+                    best_score = score
+                    best_move = move
+
+                if best_score >= beta:
+                    return best_score, best_move
+
+                alpha = max(alpha, best_score)
+
+            return best_score, best_move
+
+        # The first round is always MAX
+
+        best_score = float("-inf")
+        best_move = game.get_player_location(self)  # the current position
+        legal_moves = game.get_legal_moves()
+
+        if not legal_moves or depth == 0:
+            return self.score(game, self), best_move
+
+        for move in legal_moves:
+            score, _ = min_value(game.forecast_move(move), depth - 1, alpha, beta)
+
+            if score > best_score:
+                best_score = score
+                best_move = move
+
+            if best_score >= beta:
+                return best_score, best_move
+
+            alpha = max(alpha, best_score)
+
+        return best_score, best_move
 
         #raise NotImplementedError
