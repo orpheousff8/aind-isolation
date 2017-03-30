@@ -8,7 +8,6 @@ relative strength using tournament.py and include the results in your report.
 """
 import random
 from random import randint
-import utils
 
 class Timeout(Exception):
     """Subclass base exception for code clarity."""
@@ -188,66 +187,54 @@ class CustomPlayer:
 
         # TODO: finish this function!
 
-        def min_value(game ,depth):
+        def min_value(game , depth):
+
+            best_score = float("inf")
+            best_move = game.get_player_location(self)  # the current position
             legal_moves = game.get_legal_moves()
-            if not legal_moves:
-                return self.score(game,self), (-1,-1)
-            elif depth == 0:
-                return self.score(game,self), min([(self.score(game.forecast_move(m), self), m) for m in legal_moves])
+
+            if not legal_moves or depth == 0:
+                return self.score(game, self), best_move
+
+            for move in legal_moves:
+                score, _ = max_value(game.forecast_move(move), depth - 1)
+                if score < best_score:
+                    best_score = score
+                    best_move = move
             
-            min_v = float("inf")
-            state = None
-            for a in legal_moves:
-                v,s = max_value(game.forecast_move(a),depth-1)
-                if v < min_v:
-                    min_v = v
-                    state = s
-            
-            return min_v,state
-            
-        def max_value(game ,depth):
+            return best_score, best_move
+
+        def max_value(game, depth):
+
+            best_score = float("-inf")
+            best_move = game.get_player_location(self)  # the current position
             legal_moves = game.get_legal_moves()
-            if not legal_moves:
-                return self.score(game,self), (-1,-1)
-            elif depth == 0:
-                return self.score(game,self), max([(self.score(game.forecast_move(m), self), m) for m in legal_moves])
 
-            max_v = float("-inf")
-            state = None
-            for a in legal_moves:
-                v,s = min_value(game.forecast_move(a),depth-1)
-                if v > max_v:
-                    max_v = v
-                    state = s
-            
-            return max_v,state
+            if not legal_moves or depth == 0:
+                return self.score(game, self), best_move
 
-        """
+            for move in legal_moves:
+                score, _ = min_value(game.forecast_move(move), depth - 1)
+                if score > best_score:
+                    best_score = score
+                    best_move = move
+
+            return best_score, best_move
+
+        best_score = float("-inf")
+        best_move = game.get_player_location(self)  # the current position
         legal_moves = game.get_legal_moves()
-        if not legal_moves:
-            return (self.score(game,self),(-1, -1))
-        _, move = max([(self.score(game.forecast_move(m), self), m) for m in legal_moves])
-        
-        return (self.score(game,self),move)
-        """
-        
-        legal_moves = game.get_legal_moves()
-        if not legal_moves:
-            return self.score(game,self),(-1, -1)
-            
-        max_v = float("-inf")
-        state = None
 
-        for a in legal_moves:
-            max_v = float("-inf")
-            state = None
-            v,s = min_value(game.forecast_move(a),0)
-            if v > max_v:
-                max_v = v
-                state = s
-                    
-        return max_v,state
+        if not legal_moves or depth == 0:
+            return self.score(game, self), best_move
 
+        for move in legal_moves:
+            score, _ = min_value(game.forecast_move(move), depth - 1)
+            if score > best_score:
+                best_score = score
+                best_move = move
+
+        return best_score, best_move
         
         #raise NotImplementedError
 
@@ -293,4 +280,7 @@ class CustomPlayer:
             raise Timeout()
 
         # TODO: finish this function!
-        raise NotImplementedError
+
+
+
+        #raise NotImplementedError
