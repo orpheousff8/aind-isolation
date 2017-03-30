@@ -191,9 +191,13 @@ class CustomPlayer:
 
             best_score = float("inf")
             best_move = game.get_player_location(self)  # the current position
+
+            if depth == 0:
+                return self.score(game, self), best_move
+
             legal_moves = game.get_legal_moves()
 
-            if not legal_moves or depth == 0:
+            if not legal_moves:
                 return self.score(game, self), best_move
 
             for move in legal_moves:
@@ -208,9 +212,13 @@ class CustomPlayer:
 
             best_score = float("-inf")
             best_move = game.get_player_location(self)  # the current position
+
+            if depth == 0:
+                return self.score(game, self), best_move
+
             legal_moves = game.get_legal_moves()
 
-            if not legal_moves or depth == 0:
+            if not legal_moves:
                 return self.score(game, self), best_move
 
             for move in legal_moves:
@@ -225,9 +233,13 @@ class CustomPlayer:
 
         best_score = float("-inf")
         best_move = game.get_player_location(self)  # the current position
+
+        if depth == 0:
+            return self.score(game, self), best_move
+
         legal_moves = game.get_legal_moves()
 
-        if not legal_moves or depth == 0:
+        if not legal_moves:
             return self.score(game, self), best_move
 
         for move in legal_moves:
@@ -287,12 +299,15 @@ class CustomPlayer:
 
             best_score = float("inf")
             best_move = game.get_player_location(self)  # the current position
+
+            if depth == 0:
+                return self.score(game, self), best_move
+            if alpha == float("inf"):
+                return best_score, best_move
+
             legal_moves = game.get_legal_moves()
 
-            if alpha == float("inf"):
-                return (best_score, best_move)
-
-            if not legal_moves or depth == 0:
+            if not legal_moves:
                 return self.score(game, self), best_move
 
             for move in legal_moves:
@@ -313,13 +328,15 @@ class CustomPlayer:
 
             best_score = float("-inf")
             best_move = game.get_player_location(self)  # the current position
+
+            if depth == 0:
+                return self.score(game, self), best_move
+            if beta == float("-inf"):
+                return best_score, best_move
+
             legal_moves = game.get_legal_moves()
 
-            if beta == float("-inf"):
-                return (best_score, best_move)
-
-
-            if not legal_moves or depth == 0:
+            if not legal_moves:
                 return self.score(game, self), best_move
 
             for move in legal_moves:
@@ -340,9 +357,13 @@ class CustomPlayer:
 
         best_score = float("-inf")
         best_move = game.get_player_location(self)  # the current position
+
+        if depth == 0:
+            return self.score(game, self), best_move
+
         legal_moves = game.get_legal_moves()
 
-        if not legal_moves or depth == 0:
+        if not legal_moves:
             return self.score(game, self), best_move
 
         for move in legal_moves:
