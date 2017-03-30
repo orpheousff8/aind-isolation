@@ -44,9 +44,14 @@ def custom_score(game, player):
     if game.is_winner(player):
         return float("inf")
 
-    own_moves = len(game.get_legal_moves(player))
-    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
-    return float(own_moves - opp_moves)
+    #own_moves = len(game.get_legal_moves(player))
+    #opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+    #return float(own_moves - opp_moves)
+
+    own_moves = set(game.get_legal_moves(player))
+    opp_moves = set(game.get_legal_moves(game.get_opponent(player)))
+    common_moves = own_moves & opp_moves
+    return float(len(common_moves))
     #raise NotImplementedError
 
 
@@ -128,10 +133,20 @@ class CustomPlayer:
         self.time_left = time_left
 
         # TODO: finish this function!
-        if not legal_moves:
+        """if not legal_moves:
             return (-1, -1)
         _, move = max([(self.score(game.forecast_move(m), self), m) for m in legal_moves])
-        return move
+        return move"""
+
+        best_move = (-1, -1)
+        best_score = float("-inf")
+
+        if not legal_moves:
+            return best_move
+
+        search_method = self.minimax if self.method == 'minimax' else self.alphabeta
+        max_depth = game.width * game.height if self.iterative else self.search_depth
+        start_depth = 1 if self.iterative else self.search_depth
 
         # Perform any required initializations, including selecting an initial
         # move from the game board (i.e., an opening book), or returning
@@ -142,15 +157,34 @@ class CustomPlayer:
             # here in order to avoid timeout. The try/except block will
             # automatically catch the exception raised by the search method
             # when the timer gets close to expiring
-            pass
+            depth = start_depth
+            while depth <= max_depth:
+                self.used_score_fn = False
+                # reset the board score cache on each iteration as the score
+                # will be updated with the values from the new depth
+                score, move = search_method(game, depth)
+                depth = depth + 1
+
+                if score > best_score:
+                    best_move = move
+                    best_score = score
+
+                if not self.used_score_fn:
+                    break
 
         except Timeout:
             # Handle any actions required at timeout, if necessary
             pass
 
+        # if move is invalid (i.e (-1, -1)) after timeout or not found good move
+        # select randomly one of the legal moves
+        if best_move == (-1, -1):
+            best_move = legal_moves[random.randint(0, len(legal_moves) - 1)]
+
         # Return the best move from the last completed search iteration
+        return best_move
         #raise NotImplementedError
-        
+
     def minimax(self, game, depth, maximizing_player=True):
         """Implement the minimax search algorithm as described in the lectures.
 
@@ -193,6 +227,7 @@ class CustomPlayer:
             best_move = game.get_player_location(self)  # the current position
 
             if depth == 0:
+                self.used_score_fn = True
                 return self.score(game, self), best_move
 
             legal_moves = game.get_legal_moves()
@@ -205,7 +240,7 @@ class CustomPlayer:
                 if score < best_score:
                     best_score = score
                     best_move = move
-            
+
             return best_score, best_move
 
         def max_value(game, depth):
@@ -214,6 +249,7 @@ class CustomPlayer:
             best_move = game.get_player_location(self)  # the current position
 
             if depth == 0:
+                self.used_score_fn = True
                 return self.score(game, self), best_move
 
             legal_moves = game.get_legal_moves()
@@ -235,6 +271,7 @@ class CustomPlayer:
         best_move = game.get_player_location(self)  # the current position
 
         if depth == 0:
+            self.used_score_fn = True
             return self.score(game, self), best_move
 
         legal_moves = game.get_legal_moves()
@@ -249,7 +286,7 @@ class CustomPlayer:
                 best_move = move
 
         return best_score, best_move
-        
+
         #raise NotImplementedError
 
     def alphabeta(self, game, depth, alpha=float("-inf"), beta=float("inf"), maximizing_player=True):
@@ -301,6 +338,7 @@ class CustomPlayer:
             best_move = game.get_player_location(self)  # the current position
 
             if depth == 0:
+                self.used_score_fn = True
                 return self.score(game, self), best_move
             if alpha == float("inf"):
                 return best_score, best_move
@@ -330,6 +368,7 @@ class CustomPlayer:
             best_move = game.get_player_location(self)  # the current position
 
             if depth == 0:
+                self.used_score_fn = True
                 return self.score(game, self), best_move
             if beta == float("-inf"):
                 return best_score, best_move
@@ -359,6 +398,7 @@ class CustomPlayer:
         best_move = game.get_player_location(self)  # the current position
 
         if depth == 0:
+            self.used_score_fn = True
             return self.score(game, self), best_move
 
         legal_moves = game.get_legal_moves()
