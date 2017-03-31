@@ -241,13 +241,11 @@ class CustomPlayer:
 
         # TODO: finish this function!
 
-        best_score = float("-inf")
-        if not maximizing_player:
-            best_score = float('inf')
+        best_score = float("-inf") if maximizing_player else best_score = float('inf')
 
         best_move = (-1, -1)
-        legal_moves = game.get_legal_moves()
 
+        legal_moves = game.get_legal_moves()
         if not legal_moves:
             return self.score(game, self), best_move
 
@@ -310,13 +308,11 @@ class CustomPlayer:
 
         # TODO: finish this function!
 
-        best_score = float("-inf")
-        if not maximizing_player:
-            best_score = float('inf')
+        best_score = float("-inf") if maximizing_player else best_score = float('inf')
 
         best_move = (-1, -1)
-        legal_moves = game.get_legal_moves()
 
+        legal_moves = game.get_legal_moves()
         if not legal_moves:
             return self.score(game, self), best_move
 
