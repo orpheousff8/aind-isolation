@@ -6,8 +6,9 @@ augment the test suite with your own test cases to further test your code.
 You must test your agent's strength against a set of agents with known
 relative strength using tournament.py and include the results in your report.
 """
-import random
+
 from random import randint
+import sys
 
 class Timeout(Exception):
     """Subclass base exception for code clarity."""
@@ -45,7 +46,13 @@ def custom_score(game, player):
         return float("inf")
 
     """
-    2.5x opponent weight
+    Improved_score
+    own_moves = len(game.get_legal_moves(player))
+    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+    return float(own_moves - opp_moves)
+    """
+    """
+    Improved_score with2.5x opponent weighted
     Results:
     ----------
     ID_Improved         74.29%
@@ -79,6 +86,15 @@ def custom_score(game, player):
     opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
     return 100.0 * (own_moves - 2 * opp_moves) / (own_moves + opp_moves)
 
+    """
+    centre_width = game.width / 2.0
+    centre_height = game.height / 2.0
+    player_location = game.get_player_location(player)
+
+    close_to_centre = (game.width + game.height) / 2.0 - pow(pow((current_location[0] - center_height), 2) +
+                                                                 pow((current_location[1] - center_width), 2), 0.5)
+    return close_to_centre
+    """
 
 class CustomPlayer:
     """Game-playing agent that chooses a move using your evaluation function
@@ -167,13 +183,10 @@ class CustomPlayer:
         best_move = legal_moves[0]
 
         if game.move_count <= 1:
-            opening_book = [(2, 2), (game.width - 3, 2), (4, 2), (2, game.width - 3), (game.width - 3, game.width - 3),
-                            (game.width - 2, game.width - 3), (2, game.width - 2), (game.width - 3, game.width - 2),
-                            (game.width - 2, game.width - 2)]
-            return opening_book[randint(0, len(opening_book) - 1)]
+            return best_move
 
         start_depth = 1 if self.iterative else self.search_depth
-        max_depth = game.width * game.height - 1 if self.iterative else self.search_depth
+        max_depth = sys.maxsize - 1 if self.iterative else self.search_depth
 
         # Perform any required initializations, including selecting an initial
         # move from the game board (i.e., an opening book), or returning
@@ -241,7 +254,7 @@ class CustomPlayer:
 
         # TODO: finish this function!
 
-        best_score = float("-inf") if maximizing_player else best_score = float('inf')
+        best_score = float("-inf") if maximizing_player else float('inf')
 
         best_move = (-1, -1)
 
@@ -308,7 +321,7 @@ class CustomPlayer:
 
         # TODO: finish this function!
 
-        best_score = float("-inf") if maximizing_player else best_score = float('inf')
+        best_score = float("-inf") if maximizing_player else float('inf')
 
         best_move = (-1, -1)
 
